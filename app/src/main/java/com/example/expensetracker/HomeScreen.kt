@@ -3,13 +3,16 @@ package com.example.expensetracker
 import android.media.Image
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -24,7 +27,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import com.example.expensetracker.ui.theme.Zinc
+import java.time.format.TextStyle
 
 @Composable
 fun HomeScreen(){
@@ -63,6 +68,14 @@ fun HomeScreen(){
                     end.linkTo(parent.end)
                 }
             )
+            TransactionList(modifier = Modifier
+                .constrainAs(list){
+                    top.linkTo(card.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    bottom.linkTo(parent.bottom)
+                    height = Dimension.fillToConstraints
+                })
         }
     }
 }
@@ -77,19 +90,76 @@ fun CardItem(modifier: Modifier){
         .background(Zinc)
         .padding(16.dp)
     ){
-        Row {
-            Column {
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f)) {
+            Column(modifier = Modifier.align(Alignment.CenterStart)) {
                 Text(text = "Total Balance", fontSize = 16.sp, color = Color.White)
                 Text(
-                    text = "$5000",
+                    text = "$ 5000",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
             }
+            Image(painter = painterResource(id = R.drawable.ic_dot),
+                contentDescription = null,
+                modifier = Modifier.align(Alignment.CenterEnd)
+            )
+        }
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f)){
+            CardRowItem(modifier = Modifier.align(Alignment.CenterStart),
+                title = "Income",
+                amount = "$ 5000",
+                image = R.drawable.frame_7,
+                textStyle = Alignment.Start
+            )
+            CardRowItem(modifier = Modifier.align(Alignment.CenterEnd),
+                title = "Expense",
+                amount = "$ 3,349",
+                image = R.drawable.frame_5,
+                textStyle = Alignment.End
+            )
+        }
+
+    }
+}
+
+@Composable
+fun TransactionList(modifier: Modifier){
+    Column(modifier = modifier) {
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .border(2.dp, color = Color.Red)){
+            Text(text = "Recent Transactions", fontSize = 20.sp)
+            Text(text = "See All",
+                fontSize = 16.sp,
+                color = Color.Black,
+                modifier = Modifier.align(Alignment.CenterEnd)
+
+            )
         }
     }
 }
+@Composable
+fun CardRowItem(modifier: Modifier,
+                title:String,
+                amount:String,
+                image:Int,
+                textStyle: Alignment.Horizontal = Alignment.CenterHorizontally)
+                {
+                    Column(modifier = modifier) {
+                        Row{
+                            Image(painter = painterResource(id = image), contentDescription = null)
+                            Spacer(modifier = Modifier.size(8.dp))
+                            Text(text = title, fontSize = 16.sp, color = Color.White)
+                        }
+                        Text(text = amount, fontSize = 20.sp, color = Color.White, modifier = Modifier.align(textStyle))
+                    }
+                }
 
 @Composable
 @Preview(showBackground = true)
