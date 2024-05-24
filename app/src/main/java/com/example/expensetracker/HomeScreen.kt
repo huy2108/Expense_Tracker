@@ -97,7 +97,7 @@ fun CardItem(modifier: Modifier){
                 Text(text = "Total Balance", fontSize = 16.sp, color = Color.White)
                 Text(
                     text = "$ 5000",
-                    fontSize = 20.sp,
+                    fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
@@ -132,16 +132,33 @@ fun TransactionList(modifier: Modifier){
     Column(modifier = modifier) {
         Box(modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .border(2.dp, color = Color.Red)){
+            .padding(horizontal = 16.dp))
+        {
             Text(text = "Recent Transactions", fontSize = 20.sp)
             Text(text = "See All",
                 fontSize = 16.sp,
                 color = Color.Black,
                 modifier = Modifier.align(Alignment.CenterEnd)
-
             )
         }
+        TransactionItem(title = "Netflix",
+            amount = "- $ 2000",
+            icon = R.drawable.netflix,
+            date = "Today",
+            color = Color.Red
+        )
+        TransactionItem(title = "Transfer",
+            amount = "- $ 80",
+            icon = R.drawable.transfer,
+            date = "Today",
+            color = Color.Red
+        )
+        TransactionItem(title = "Upwoek",
+            amount = "$ 2000",
+            icon = R.drawable.upwork,
+            date = "Today",
+            color = Color.Green
+        )
     }
 }
 @Composable
@@ -160,6 +177,30 @@ fun CardRowItem(modifier: Modifier,
                         Text(text = amount, fontSize = 20.sp, color = Color.White, modifier = Modifier.align(textStyle))
                     }
                 }
+
+@Composable
+fun TransactionItem(title: String, amount:String, icon: Int, date: String, color: Color){
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .padding(16.dp)){
+        Row{
+            Image(painter = painterResource(id = icon),
+                contentDescription = null,
+                modifier = Modifier.size(50.dp)
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+            Column {
+                Text(text = title, fontSize = 16.sp)
+                Text(text = date, fontSize = 12.sp)
+            }
+        }
+        Text(text = amount,
+            fontSize = 16.sp,
+            modifier = Modifier.align(Alignment.CenterEnd),
+            color = color
+        )
+    }
+}
 
 @Composable
 @Preview(showBackground = true)
