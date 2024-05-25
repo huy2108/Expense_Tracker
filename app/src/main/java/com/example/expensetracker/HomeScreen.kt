@@ -36,7 +36,7 @@ fun HomeScreen(){
     Surface(modifier = Modifier.fillMaxSize()) {
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
             val(nameRow, list, card, topBar) = createRefs()
-            Image(painter = painterResource(id = R.drawable.rectangle_9), contentDescription = null,
+            Image(painter = painterResource(id = R.drawable.ic_header), contentDescription = null,
                 modifier = Modifier.constrainAs(topBar){
                     top.linkTo(parent.top)
                     start.linkTo(parent.start)
@@ -97,7 +97,7 @@ fun CardItem(modifier: Modifier){
                 Text(text = "Total Balance", fontSize = 16.sp, color = Color.White)
                 Text(
                     text = "$ 5000",
-                    fontSize = 24.sp,
+                    fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
@@ -174,7 +174,7 @@ fun CardRowItem(modifier: Modifier,
                             Spacer(modifier = Modifier.size(8.dp))
                             Text(text = title, fontSize = 16.sp, color = Color.White)
                         }
-                        Text(text = amount, fontSize = 20.sp, color = Color.White, modifier = Modifier.align(textStyle))
+                        Text(text = amount, fontWeight = FontWeight.Medium,fontSize = 24.sp, color = Color.White, modifier = Modifier.align(textStyle))
                     }
                 }
 
