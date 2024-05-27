@@ -1,9 +1,12 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.example.expensetracker
 
 import android.widget.Space
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,10 +20,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -79,6 +89,20 @@ fun AddExpense() {
 
 @Composable
 fun DataForm(modifier: Modifier){
+
+    val name = remember{
+        mutableStateOf("")
+    }
+    val type = remember {
+        mutableStateOf("")
+    }
+    val date = remember{
+        mutableStateOf(0L)
+    }
+    val dateDialogVisibility = remember {
+        mutableStateOf(false)
+    }
+
     Column(modifier = modifier
         .padding(16.dp)
         .shadow(16.dp)
@@ -94,7 +118,7 @@ fun DataForm(modifier: Modifier){
                 .align(Alignment.Start)
         )
         Spacer(modifier = Modifier.size(4.dp))
-        OutlinedTextField(value = "c", onValueChange = {}, modifier = Modifier
+        OutlinedTextField(value = type.value, onValueChange = {type.value = it}, modifier = Modifier
             .fillMaxWidth()
         )
         Spacer(modifier = Modifier.size(16.dp))
@@ -105,7 +129,7 @@ fun DataForm(modifier: Modifier){
                 .align(Alignment.Start)
         )
         Spacer(modifier = Modifier.size(4.dp))
-        OutlinedTextField(value = "c", onValueChange = {}, modifier = Modifier
+        OutlinedTextField(value = name.value, onValueChange = {name.value = it}, modifier = Modifier
             .fillMaxWidth()
         )
         Spacer(modifier = Modifier.size(16.dp))
@@ -139,8 +163,10 @@ fun DataForm(modifier: Modifier){
                 .align(Alignment.Start)
         )
         Spacer(modifier = Modifier.size(4.dp))
-        OutlinedTextField(value = "c", onValueChange = {}, modifier = Modifier
+        OutlinedTextField(value = if(date.value == 0L) "" else Utils.formatDateToReadableForm(date.value), onValueChange = {}, modifier = Modifier
             .fillMaxWidth()
+            .clickable { dateDialogVisibility.value = true },
+            enabled = false
         )
         Spacer(modifier = Modifier.size(16.dp))
 
@@ -154,6 +180,39 @@ fun DataForm(modifier: Modifier){
         {
             Text(text = "Add Expense", fontSize = 14.sp)
         }
+    }
+    if(dateDialogVisibility.value){
+        ExpenseDatePickerDialog(onDateSelected =
+        {
+            date.value = it
+            dateDialogVisibility.value = false
+        }, onDismiss = {
+            dateDialogVisibility.value = false
+        })
+    }
+}
+
+@Composable
+fun ExpenseDatePickerDialog(
+    onDateSelected: (date: Long) -> Unit,
+    onDismiss: () -> Unit
+){
+    val datePickerState = rememberDatePickerState()
+    val selectedDate = datePickerState.selectedDateMillis ?: 0L
+    DatePickerDialog(onDismissRequest = { onDismiss() },
+        confirmButton = {
+            TextButton(onClick = { onDateSelected(selectedDate) }) {
+                Text(text = "Confirm")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { onDateSelected(selectedDate) }) {
+                Text(text = "Cancel")
+            }
+        }
+
+    ) {
+        DatePicker(state = datePickerState)
     }
 }
 
