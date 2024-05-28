@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.expensetracker.Utils
 import com.example.expensetracker.data.dao.ExpenseDao
 import com.example.expensetracker.data.model.ExpenseEntity
 import kotlinx.coroutines.CoroutineScope

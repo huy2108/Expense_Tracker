@@ -160,7 +160,7 @@ fun TransactionList(modifier: Modifier, list: List<ExpenseEntity>, viewModel: Ho
         }
         items(list){ item ->
             TransactionItem(
-                title = item.title!!,
+                title = item.title,
                 amount = item.amount.toString(),
                 icon = viewModel.getItemIcon(item),
                 date = item.date.toString(),
@@ -203,7 +203,7 @@ fun TransactionItem(title: String, amount:String, icon: Int, date: String, color
                 Text(text = date, fontSize = 14.sp)
             }
         }
-        Text(text = if(color == Color.Red) "-$ ${amount}" else "$ ${amount}",
+        Text(text = if(color == Color.Red) "- $ ${amount}" else "+ $ ${amount}",
             fontSize = 20.sp,
             modifier = Modifier.align(Alignment.CenterEnd),
             color = color,
