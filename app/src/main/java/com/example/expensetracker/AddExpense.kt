@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
@@ -48,14 +49,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.expensetracker.data.model.ExpenseEntity
+import com.example.expensetracker.ui.theme.Zinc
 import com.example.expensetracker.viewmodel.AddExpenseViewModel
 import com.example.expensetracker.viewmodel.AddExpenseViewModelFactory
 import kotlinx.coroutines.launch
 import kotlin.math.exp
 
 @Composable
-fun AddExpense() {
+fun AddExpense(navController: NavController) {
     val viewModel = AddExpenseViewModelFactory(LocalContext.current).create(AddExpenseViewModel::class.java)
     val courinetineScope = rememberCoroutineScope()
     Surface(modifier = Modifier.fillMaxSize()) {
@@ -76,7 +80,13 @@ fun AddExpense() {
                     end.linkTo(parent.end)
                 }
             ){
-                Image(painter = painterResource(id = R.drawable.chevron_left), contentDescription = null, Modifier.align(Alignment.CenterStart))
+//                Image(painter = painterResource(id = R.drawable.chevron_left),
+//                    contentDescription = null,
+//                    Modifier.align(Alignment.CenterStart)
+//                        .clickable {
+//                            navController.navigate("/home")
+//                        }
+//                )
                 Text(text = "Add Expense",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
@@ -86,7 +96,10 @@ fun AddExpense() {
                         .align(Alignment.Center)
                 )
                 Image(painter = painterResource(id = R.drawable.ic_dot), contentDescription = null,
-                    modifier = Modifier.align(Alignment.CenterEnd))
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                )
+
             }
             DataForm(modifier = Modifier
                 .constrainAs(card) {
@@ -94,10 +107,12 @@ fun AddExpense() {
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
-                .padding(top = 60.dp),
+                .padding(top = 30.dp),
                 onAddExpenseClick = {
                     courinetineScope.launch {
-                        viewModel.addExpense(it)
+                        if(viewModel.addExpense(it)){
+                            navController.popBackStack()
+                        }
                     }
                 }
             )
@@ -207,11 +222,13 @@ fun DataForm(modifier: Modifier, onAddExpenseClick: (model: ExpenseEntity) -> Un
                       )
                 onAddExpenseClick(model)
             },
-            Modifier
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Zinc // Set the button background color to Zinc
+            ),
+            modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(4.dp))
                 .padding(top = 25.dp)
-
         )
         {
             Text(text = "Add Expense", fontSize = 14.sp)
@@ -285,5 +302,5 @@ fun ExpenseDropDown(listOfItems: List<String>, onItemSelected: (item: String) ->
 @Composable
 @Preview(showBackground = true)
 fun AddExpensePreview(){
-    AddExpense()
+    AddExpense(rememberNavController())
 }

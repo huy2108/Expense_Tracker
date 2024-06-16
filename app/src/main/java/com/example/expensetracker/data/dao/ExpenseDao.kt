@@ -14,12 +14,24 @@ interface ExpenseDao {
     @Query("SELECT * FROM expense_table")
     fun getAllExpenses(): Flow<List<ExpenseEntity>>
 
+    @Query("SELECT * FROM expense_table WHERE id = :id")
+    fun getExpenseById(id: Int): Flow<ExpenseEntity?>
+
+    @Query("SELECT * FROM expense_table ORDER BY date DESC")
+    fun getAllExpensesOrderedByDateDesc(): Flow<List<ExpenseEntity>>
+
+    @Query("SELECT * FROM expense_table WHERE type = :expenseType ORDER BY date DESC")
+    fun getExpensesByType(expenseType: String): Flow<List<ExpenseEntity>>
+
     @Insert
     suspend fun insertExpense(expenseEntity: ExpenseEntity)
+
+    @Query("DELETE FROM expense_table")
+    suspend fun deleteAll()
 
     @Delete
     suspend fun deleteExpense(expenseEntity: ExpenseEntity)
 
     @Update
-    suspend fun updateExpense(expenseEntity: ExpenseEntity)
+    suspend fun updateExpense(expense: ExpenseEntity)
 }

@@ -3,48 +3,45 @@ package com.example.expensetracker.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.example.expensetracker.R
+import com.example.expensetracker.Utils
 import com.example.expensetracker.data.ExpenseDatabase
 import com.example.expensetracker.data.dao.ExpenseDao
 import com.example.expensetracker.data.model.ExpenseEntity
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 
-class HomeViewModel(dao: ExpenseDao) : ViewModel() {
-    val expenses = dao.getAllExpenses()
+class HomeViewModel(private val dao: ExpenseDao) : ViewModel() {
+    private val _expensesByType = MutableStateFlow<List<ExpenseEntity>>(emptyList())
+    val expensesByType: Flow<List<ExpenseEntity>> = _expensesByType
 
-    fun getBalance(list : List<ExpenseEntity>) : String {
-        var total = 0.0
-        list.forEach{
-            if(it.type == "Income"){
-                total += it.amount
-            }
-            else{
-                total -= it.amount
-            }
-        }
+    val allExpenses = dao.getAllExpensesOrderedByDateDesc()
 
-        return "$ ${total}"
+    fun getBalance(expenses: List<ExpenseEntity>): Double {
+        val totalIncome = getTotalIncome(expenses)
+        val totalExpense = getTotalExpense(expenses)
+        return totalIncome - totalExpense
     }
 
-    fun getTotalExpense(list : List<ExpenseEntity>) : String {
-        var total = 0.0
-        list.forEach{
-            if(it.type == "Expense"){
-                total += it.amount
+    fun getAllExpensesByType(type: String){
+        viewModelScope.launch {
+            allExpenses.collect { allExpenses ->
+                // Update _expensesByType based on all expenses
+                // For example, filter expenses by type "Income"
+                val incomeExpenses = allExpenses.filter { it.type == type }
+                _expensesByType.value = incomeExpenses
             }
         }
-
-        return "$ ${total}"
     }
 
-    fun getTotalIncome(list : List<ExpenseEntity>) : String {
-        var total = 0.0
-        list.forEach{
-            if(it.type == "Income"){
-                total += it.amount
-            }
-        }
+    fun getTotalExpense(expenses: List<ExpenseEntity>): Double {
+        return expenses.filter { it.type == "Expense" }.sumByDouble { it.amount }
+    }
 
-        return "$ ${total}"
+    fun getTotalIncome(expenses: List<ExpenseEntity>): Double {
+        return expenses.filter { it.type == "Income" }.sumByDouble { it.amount }
     }
 
     fun getItemIcon(it : ExpenseEntity) : Int {

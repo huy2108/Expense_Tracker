@@ -4,8 +4,11 @@ import android.media.Image
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+//import androidx.compose.foundation.layout.FlowColumnScopeInstance.align
+//import androidx.compose.foundation.layout.FlowRowScopeInstance.align
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,10 +19,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.Modifier
@@ -32,6 +42,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.expensetracker.data.model.ExpenseEntity
 import com.example.expensetracker.ui.theme.Zinc
 import com.example.expensetracker.viewmodel.HomeViewModel
@@ -39,15 +51,19 @@ import com.example.expensetracker.viewmodel.HomeViewModelFactory
 import java.time.format.TextStyle
 
 @Composable
-fun HomeScreen(){
+fun HomeScreen(navController: NavController){
     val viewModel : HomeViewModel = HomeViewModelFactory(LocalContext.current).create(HomeViewModel::class.java)
     Surface(modifier = Modifier.fillMaxSize()) {
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-            val(nameRow, list, card, topBar) = createRefs()
-            val state = viewModel.expenses.collectAsState(initial = emptyList())
+            val(nameRow, list, card, topBar, addIcon) = createRefs()
+            val state = viewModel.allExpenses.collectAsState(initial = emptyList())
             val expense = viewModel.getTotalExpense(state.value)
             val income = viewModel.getTotalIncome(state.value)
             val balance = viewModel.getBalance(state.value)
+            val expensesByType by viewModel.expensesByType.collectAsState(initial = emptyList())
+            val type = remember {
+                mutableStateOf("")
+            }
 
             Image(painter = painterResource(id = R.drawable.ic_header), contentDescription = null,
                 modifier = Modifier.constrainAs(topBar){
@@ -71,7 +87,8 @@ fun HomeScreen(){
                 }
                 Image(painter = painterResource(id = R.drawable.frame_4),
                     contentDescription = null,
-                    modifier = Modifier.align(Alignment.CenterEnd)
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
                 )
             }
             CardItem(modifier = Modifier
@@ -79,23 +96,51 @@ fun HomeScreen(){
                     top.linkTo(nameRow.bottom)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                }, balance, income, expense
+                }, "${balance}", "${income}", "${expense}", type, viewModel
             )
 
-            TransactionList(modifier = Modifier
-                .constrainAs(list){
-                    top.linkTo(card.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    bottom.linkTo(parent.bottom)
-                    height = Dimension.fillToConstraints
-                },list = state.value, viewModel)
+            viewModel.getAllExpensesByType(type.value)
+            if(type.value == "Income" || type.value == "Expense"){
+                TransactionList(modifier = Modifier
+                    .constrainAs(list){
+                        top.linkTo(card.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        bottom.linkTo(parent.bottom)
+                        height = Dimension.fillToConstraints
+                    },expensesByType, viewModel, type, navController)
+            }else {
+                TransactionList(modifier = Modifier
+                    .constrainAs(list){
+                        top.linkTo(card.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        bottom.linkTo(parent.bottom)
+                        height = Dimension.fillToConstraints
+                    },list = state.value, viewModel, type,navController)
+            }
+
+
+//            Image(painter = painterResource(id = R.drawable.group_10),
+//                contentDescription = null,
+//                Modifier
+//                    .constrainAs(addIcon) {
+//                        bottom.linkTo(parent.bottom)
+//                        start.linkTo(parent.start)
+//                        end.linkTo(parent.end)
+//                    }
+//                    .clickable {
+//                        navController.navigate("/addExpense")
+//                    }
+//                    .size(100.dp)
+//
+//            )
         }
     }
 }
 
 @Composable
-fun CardItem(modifier: Modifier, balance: String, income: String, expense: String){
+fun CardItem(modifier: Modifier, balance: String, income: String, expense: String, type: MutableState<String>,viewModel: HomeViewModel){
     Column(modifier = modifier
         .padding(16.dp)
         .fillMaxWidth()
@@ -104,6 +149,9 @@ fun CardItem(modifier: Modifier, balance: String, income: String, expense: Strin
         .background(Zinc)
         .padding(16.dp)
     ){
+        var showMenu by remember {
+            mutableStateOf(false)
+        }
         Box(modifier = Modifier
             .fillMaxWidth()
             .weight(1f)) {
@@ -116,10 +164,24 @@ fun CardItem(modifier: Modifier, balance: String, income: String, expense: Strin
                     color = Color.White
                 )
             }
-            Image(painter = painterResource(id = R.drawable.ic_dot),
-                contentDescription = null,
-                modifier = Modifier.align(Alignment.CenterEnd)
-            )
+            Column (modifier = Modifier.align(Alignment.CenterEnd)){
+                Image(painter = painterResource(id = R.drawable.ic_dot),
+                    contentDescription = null,
+                    modifier = Modifier
+//                    .align(Alignment.CenterEnd)
+                        .clickable { showMenu = !showMenu }
+                )
+                ExpenseDropDown(
+                    items = listOf("--All--","Income", "Expense"),
+                    showMenu = showMenu,
+                    onDismissRequest = { showMenu = false },
+                    onItemSelected = { selectedType ->
+                        type.value = selectedType
+                        showMenu = false
+                    }
+                )
+            }
+
         }
         Box(modifier = Modifier
             .fillMaxWidth()
@@ -142,7 +204,29 @@ fun CardItem(modifier: Modifier, balance: String, income: String, expense: Strin
 }
 
 @Composable
-fun TransactionList(modifier: Modifier, list: List<ExpenseEntity>, viewModel: HomeViewModel){
+fun ExpenseDropDown(
+    modifier: Modifier = Modifier,
+    items: List<String>,
+    showMenu: Boolean,
+    onDismissRequest: () -> Unit,
+    onItemSelected: (String) -> Unit
+) {
+    DropdownMenu(
+        modifier = modifier,
+        expanded = showMenu,
+        onDismissRequest = onDismissRequest
+    ) {
+        items.forEach { item ->
+            DropdownMenuItem(
+                text = {Text(text = item)},
+                onClick = {
+                    onItemSelected(item)
+                })
+        }
+    }
+}
+@Composable
+fun TransactionList(modifier: Modifier, list: List<ExpenseEntity>, viewModel: HomeViewModel, type: MutableState<String>,navController: NavController){
 
     LazyColumn(modifier = modifier) {
         item {
@@ -150,11 +234,21 @@ fun TransactionList(modifier: Modifier, list: List<ExpenseEntity>, viewModel: Ho
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp))
             {
-                Text(text = "Recent Transactions", fontSize = 22.sp)
+                if(type.value == "Income" || type.value == "Expense"){
+                    Text(text = type.value , fontSize = 22.sp)
+                }
+                else {
+                    Text(text = "Recent Transactions", fontSize = 22.sp)
+                }
+
                 Text(text = "See All",
                     fontSize = 18.sp,
                     color = Color.Black,
-                    modifier = Modifier.align(Alignment.CenterEnd)
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .clickable {
+                            type.value = "--All--"
+                        }
                 )
             }
         }
@@ -163,8 +257,11 @@ fun TransactionList(modifier: Modifier, list: List<ExpenseEntity>, viewModel: Ho
                 title = item.title,
                 amount = item.amount.toString(),
                 icon = viewModel.getItemIcon(item),
-                date = item.date.toString(),
-                color = if(item.type == "Income") Color.Green else Color.Red
+                date = Utils.formatDateToReadableForm(item.date),
+                color = if(item.type == "Income") Color.Green else Color.Red,
+                onClick = {
+                    navController.navigate("edit_expense/${item.id}")
+                }
             )
             
         }
@@ -188,10 +285,12 @@ fun CardRowItem(modifier: Modifier,
                 }
 
 @Composable
-fun TransactionItem(title: String, amount:String, icon: Int, date: String, color: Color){
+fun TransactionItem(title: String, amount:String, icon: Int, date: String, color: Color, onClick: () -> Unit){
     Box(modifier = Modifier
         .fillMaxWidth()
-        .padding(16.dp)){
+        .padding(16.dp)
+        .clickable { onClick() }
+    ){
         Row{
             Image(painter = painterResource(id = icon),
                 contentDescription = null,
@@ -215,5 +314,5 @@ fun TransactionItem(title: String, amount:String, icon: Int, date: String, color
 @Composable
 @Preview(showBackground = true)
 fun PreviewHomeScreen(){
-    HomeScreen()
+    HomeScreen(rememberNavController())
 }
