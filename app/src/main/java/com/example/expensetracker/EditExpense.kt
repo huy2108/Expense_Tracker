@@ -3,8 +3,10 @@ package com.example.expensetracker
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -59,12 +61,14 @@ fun EditExpense(navController: NavController, expenseId: Int?){
     val dateDialogVisibility = remember { mutableStateOf(false) }
     val category = remember { mutableStateOf("") }
     val amount = remember { mutableStateOf("") }
+    val currentExpense = remember { mutableStateOf<ExpenseEntity?>(null) }
 
 
     LaunchedEffect(expenseId) {
         expenseId?.let {
             viewModel.getExpenseById(it).collect { expense ->
                 expense?.let {
+                    currentExpense.value = it
                     name.value = it.title
                     type.value = it.type
                     date.value = it.date
@@ -183,30 +187,53 @@ fun EditExpense(navController: NavController, expenseId: Int?){
                     )
 
 
-                androidx.compose.material3.Button(
-                    onClick = {
-                        val editedExpense = ExpenseEntity(
-                            id = expenseId,
-                            title = name.value,
-                            amount = amount.value.toDoubleOrNull() ?: 0.0,
-                            date = date.value,
-                            category = category.value,
-                            type = type.value
-                        )
-                        viewModel.updateExpense(editedExpense)
-                        navController.popBackStack()
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Zinc // Set the button background color to Zinc
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(4.dp))
-                        .padding(top = 25.dp, end = 16.dp, start = 16.dp, bottom = 16.dp)
-                )
-                {
-                    androidx.compose.material3.Text(text = "Save", fontSize = 14.sp)
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    androidx.compose.material3.Button(
+                        onClick = {
+                            currentExpense.value?.let {
+                                viewModel.deleteExpense(it)
+                                navController.popBackStack()
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Red // Set the button background color to Red for delete
+                        ),
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(4.dp))
+                            .padding(end = 8.dp)
+                    ) {
+                        androidx.compose.material3.Text(text = "Delete", fontSize = 14.sp)
+                    }
+                    androidx.compose.material3.Button(
+                        onClick = {
+                            val editedExpense = ExpenseEntity(
+                                id = expenseId,
+                                title = name.value,
+                                amount = amount.value.toDoubleOrNull() ?: 0.0,
+                                date = date.value,
+                                category = category.value,
+                                type = type.value
+                            )
+                            viewModel.updateExpense(editedExpense)
+                            navController.popBackStack()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Zinc // Set the button background color to Zinc
+                        ),
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(4.dp))
+                            .padding(end = 8.dp)
+                    ) {
+                        androidx.compose.material3.Text(text = "Save", fontSize = 14.sp)
+                    }
                 }
+
 
 
                 if(dateDialogVisibility.value){

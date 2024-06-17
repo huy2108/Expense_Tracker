@@ -48,10 +48,6 @@ fun Graph(navController: NavController){
                         .padding(16.dp)
                         .align(Alignment.Center)
                 )
-                Image(painter = painterResource(id = R.drawable.ic_dot), contentDescription = null,
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                )
             }
         }
     }

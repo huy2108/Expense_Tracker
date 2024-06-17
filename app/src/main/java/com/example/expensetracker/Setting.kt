@@ -11,6 +11,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Surface
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,11 +28,13 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.expensetracker.viewmodel.AddExpenseViewModel
+import com.example.expensetracker.viewmodel.AddExpenseViewModelFactory
 import kotlinx.coroutines.launch
 
 @Composable
 fun Setting(navController: NavController){
-
+    val viewModel = AddExpenseViewModelFactory(LocalContext.current).create(AddExpenseViewModel::class.java)
     Surface(modifier = Modifier.fillMaxSize()) {
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
             val (nameRow, list, card, topBar) = createRefs()
@@ -57,10 +61,6 @@ fun Setting(navController: NavController){
                         .padding(16.dp)
                         .align(Alignment.Center)
                 )
-                Image(painter = painterResource(id = R.drawable.ic_dot), contentDescription = null,
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                )
             }
             DataManipulation(modifier = Modifier
                 .constrainAs(card) {
@@ -68,14 +68,16 @@ fun Setting(navController: NavController){
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
-                .padding(top = 30.dp)
+                .padding(top = 30.dp),
+                viewModel,
+                navController
             )
         }
     }
 }
 
 @Composable
-fun DataManipulation(modifier: Modifier){
+fun DataManipulation(modifier: Modifier, viewModel: AddExpenseViewModel, navController: NavController){
     Column(modifier = modifier
         .padding(16.dp)
         .shadow(16.dp)
@@ -85,10 +87,20 @@ fun DataManipulation(modifier: Modifier){
         .padding(16.dp)
         .verticalScroll(rememberScrollState())
     ){
-        Text(text = "NAME", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color.Gray,
+        androidx.compose.material3.Button(
+            onClick = {
+                viewModel.deleteAllExpenses()
+                navController.popBackStack()
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Red // Set the button background color to Red for delete all
+            ),
             modifier = Modifier
-                .align(Alignment.Start)
-        )
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            androidx.compose.material3.Text(text = "Erase All Data", fontSize = 14.sp)
+        }
     }
 }
 

@@ -95,10 +95,6 @@ fun AddExpense(navController: NavController) {
                         .padding(16.dp)
                         .align(Alignment.Center)
                 )
-                Image(painter = painterResource(id = R.drawable.ic_dot), contentDescription = null,
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                )
 
             }
             DataForm(modifier = Modifier
@@ -107,7 +103,7 @@ fun AddExpense(navController: NavController) {
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
-                .padding(top = 30.dp),
+                .padding(top = 5.dp),
                 onAddExpenseClick = {
                     courinetineScope.launch {
                         if(viewModel.addExpense(it)){

@@ -41,6 +41,12 @@ class AddExpenseViewModel(val dao: ExpenseDao) : ViewModel() {
         }
     }
 
+    fun deleteAllExpenses() {
+        viewModelScope.launch {
+            dao.deleteAll()
+        }
+    }
+
     suspend fun deleteAll() : Boolean {
         return try {
             dao.deleteAll()
