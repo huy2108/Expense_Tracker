@@ -13,3 +13,4 @@ object Utils {
         return String.format("%.2f", d)
     }
 }
+

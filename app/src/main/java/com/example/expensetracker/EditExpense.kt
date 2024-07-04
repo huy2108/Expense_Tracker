@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+//import androidx.compose.foundation.layout.FlowColumnScopeInstance.align
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -49,6 +50,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.ui.graphics.ColorFilter
+
 //import androidx.compose.material.ButtonDefaults
 
 @Composable
@@ -61,7 +64,9 @@ fun EditExpense(navController: NavController, expenseId: Int?){
     val dateDialogVisibility = remember { mutableStateOf(false) }
     val category = remember { mutableStateOf("") }
     val amount = remember { mutableStateOf("") }
+    val bookmark = remember { mutableStateOf(false) }
     val currentExpense = remember { mutableStateOf<ExpenseEntity?>(null) }
+    val selectedIconColor = Color.White
 
 
     LaunchedEffect(expenseId) {
@@ -74,6 +79,7 @@ fun EditExpense(navController: NavController, expenseId: Int?){
                     date.value = it.date
                     category.value = it.category
                     amount.value = it.amount.toString()
+                    bookmark.value = it.bookmark
                 }
             }
         }
@@ -97,6 +103,13 @@ fun EditExpense(navController: NavController, expenseId: Int?){
                     end.linkTo(parent.end)
                 }
             ){
+                Image(painter = painterResource(id = R.drawable.chevron_left), contentDescription = null,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .clickable {
+                            navController.navigate("home")
+                        }
+                    )
                 Text(
                     text = "Edit Expense",
                     fontSize = 22.sp,
@@ -106,6 +119,28 @@ fun EditExpense(navController: NavController, expenseId: Int?){
                         .padding(16.dp)
                         .align(Alignment.Center)
                 )
+                Image(
+                        painter = painterResource(id = if (bookmark.value) R.drawable.bookmarkfilled else R.drawable.bookmarkoutlined),
+                contentDescription = null,
+                colorFilter = if (bookmark.value) ColorFilter.tint(selectedIconColor) else null,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .size(24.dp)
+                    .clickable {
+                        bookmark.value = !bookmark.value
+                        val editedExpense = ExpenseEntity(
+                            id = expenseId,
+                            title = name.value,
+                            amount = amount.value.toDoubleOrNull() ?: 0.0,
+                            date = date.value,
+                            category = category.value,
+                            type = type.value,
+                            bookmark = bookmark.value
+                        )
+                        viewModel.updateExpense(editedExpense)
+                    }
+                )
+
             }
             Column(modifier = Modifier
                 .padding(30.dp)
@@ -142,7 +177,9 @@ fun EditExpense(navController: NavController, expenseId: Int?){
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color.Gray,
-                        modifier = Modifier.align(Alignment.Start).padding(start = 16.dp)
+                        modifier = Modifier
+                            .align(Alignment.Start)
+                            .padding(start = 16.dp)
                     )
                     OutlinedTextField(
                         value = if (date.value == 0L) "" else Utils.formatDateToReadableForm(date.value),
@@ -161,14 +198,18 @@ fun EditExpense(navController: NavController, expenseId: Int?){
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color.Gray,
-                        modifier = Modifier.align(Alignment.Start).padding(start = 16.dp, top = 16.dp)
+                        modifier = Modifier
+                            .align(Alignment.Start)
+                            .padding(start = 16.dp, top = 16.dp)
                     )
                     Spacer(modifier = Modifier.size(4.dp))
                     ExpenseDropDownEdit(
                         listOfItems = listOf("--CATEGORY--","Netflix", "Paypal", "Salary", "Upwork","Others"),
                         value = category.value,
                         onItemSelected = { category.value = it },
-                        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 16.dp, end = 16.dp)
                     )
 
                     Text(
@@ -176,14 +217,18 @@ fun EditExpense(navController: NavController, expenseId: Int?){
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color.Gray,
-                        modifier = Modifier.align(Alignment.Start).padding(start = 16.dp, top = 16.dp)
+                        modifier = Modifier
+                            .align(Alignment.Start)
+                            .padding(start = 16.dp, top = 16.dp)
                     )
                     Spacer(modifier = Modifier.size(4.dp))
                     ExpenseDropDownEdit(
                         listOfItems = listOf("--TYPE--", "Income", "Expense"),
                         value = type.value,
                         onItemSelected = { type.value = it },
-                        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 16.dp, end = 16.dp)
                     )
 
 

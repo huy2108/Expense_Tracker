@@ -79,9 +79,9 @@ fun MainScreen() {
                         )
                     )
                     NavigationBarItem(
-                        selected = backStackEntry.value?.destination?.route == "graph",
-                        onClick = { navController.navigate("graph") },
-                        icon = { Icon(painter = painterResource(id = R.drawable.graph), contentDescription = "graph", modifier = Modifier.size(34.dp)) },
+                        selected = backStackEntry.value?.destination?.route == "bookmark",
+                        onClick = { navController.navigate("bookmark") },
+                        icon = { Icon(painter = painterResource(id = R.drawable.bookmark), contentDescription = "graph", modifier = Modifier.size(34.dp)) },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = Color.Black, // Icon color when selected
                             selectedTextColor = Color.Black, // Text color when selected
@@ -135,14 +135,14 @@ fun MainScreen() {
                         Setting(navController)
                     }
                 }
-                composable("graph") {
+                composable("bookmark") {
                     Surface(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(innerPadding),
                         color = Color.White
                     ) {
-                        Graph(navController)
+                        BookMark(navController)
                     }
                 }
                 composable(

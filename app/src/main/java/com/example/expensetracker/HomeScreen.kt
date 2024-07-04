@@ -120,21 +120,6 @@ fun HomeScreen(navController: NavController){
                     },list = state.value, viewModel, type,navController)
             }
 
-
-//            Image(painter = painterResource(id = R.drawable.group_10),
-//                contentDescription = null,
-//                Modifier
-//                    .constrainAs(addIcon) {
-//                        bottom.linkTo(parent.bottom)
-//                        start.linkTo(parent.start)
-//                        end.linkTo(parent.end)
-//                    }
-//                    .clickable {
-//                        navController.navigate("/addExpense")
-//                    }
-//                    .size(100.dp)
-//
-//            )
         }
     }
 }

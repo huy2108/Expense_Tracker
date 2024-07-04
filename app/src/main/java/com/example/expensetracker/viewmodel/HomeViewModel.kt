@@ -18,6 +18,7 @@ class HomeViewModel(private val dao: ExpenseDao) : ViewModel() {
     val expensesByType: Flow<List<ExpenseEntity>> = _expensesByType
 
     val allExpenses = dao.getAllExpensesOrderedByDateDesc()
+    val expensesByBookmarkTrue: Flow<List<ExpenseEntity>> = dao.getExpensesByBookmarkTrue()
 
     fun getBalance(expenses: List<ExpenseEntity>): Double {
         val totalIncome = getTotalIncome(expenses)

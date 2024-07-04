@@ -1,5 +1,6 @@
 package com.example.expensetracker.data.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -34,4 +35,7 @@ interface ExpenseDao {
 
     @Update
     suspend fun updateExpense(expense: ExpenseEntity)
+
+    @Query("SELECT * FROM expense_table WHERE bookmark = 1")
+    fun getExpensesByBookmarkTrue(): Flow<List<ExpenseEntity>>
 }

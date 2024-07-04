@@ -40,6 +40,7 @@ android {
     }
     buildFeatures {
         compose = true
+        viewBinding = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -76,8 +77,10 @@ dependencies {
     implementation("androidx.compose.material:material:1.2.0")
     implementation("androidx.compose.material:material-icons-core:1.0.0")
     implementation("androidx.compose.material:material-icons-extended:1.0.0")
-    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
-    implementation("com.github.Himanshoe:charts:latest-version")
+//    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation("com.himanshoe:charty:1.0.1")
+//    implementation("com.github.Himanshoe:charts:latest-version")
+
 //
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
@@ -89,5 +92,7 @@ dependencies {
     val nav_version = "2.7.7"
     implementation("androidx.navigation:navigation-compose:$nav_version")
 
+    api("androidx.navigation:navigation-fragment-ktx:$nav_version")
 
 }
+
