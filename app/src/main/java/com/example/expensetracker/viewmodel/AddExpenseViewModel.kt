@@ -47,14 +47,14 @@ class AddExpenseViewModel(val dao: ExpenseDao) : ViewModel() {
         }
     }
 
-    suspend fun deleteAll() : Boolean {
-        return try {
-            dao.deleteAll()
-            true
-        } catch (ex:Throwable){
-            false
-        }
-    }
+//    suspend fun deleteAll() : Boolean {
+//        return try {
+//            dao.deleteAll()
+//            true
+//        } catch (ex:Throwable){
+//            false
+//        }
+//    }
 }
 
 class AddExpenseViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
