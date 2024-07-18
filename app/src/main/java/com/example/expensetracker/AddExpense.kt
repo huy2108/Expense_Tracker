@@ -58,19 +58,30 @@ import com.example.expensetracker.viewmodel.AddExpenseViewModelFactory
 import kotlinx.coroutines.launch
 import kotlin.math.exp
 
+/**
+ * Composable function for adding an expense.
+ * Handles input of expense details and addition through ViewModel.
+ *
+ * @param navController NavController for navigating between screens.
+ */
 @Composable
 fun AddExpense(navController: NavController) {
+    // Create ViewModel instance using ViewModelFactory
     val viewModel = AddExpenseViewModelFactory(LocalContext.current).create(AddExpenseViewModel::class.java)
     val courinetineScope = rememberCoroutineScope()
     Surface(modifier = Modifier.fillMaxSize()) {
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
             val (nameRow, list, card, topBar) = createRefs()
+
+            // Top bar with header image
             Image(painter = painterResource(id = R.drawable.ic_header), contentDescription = null,
                 modifier = Modifier.constrainAs(topBar) {
                     top.linkTo(parent.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 })
+
+            // Box containing "Add Expense" text
             Box(modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 16.dp, top = 60.dp, end = 16.dp)
@@ -80,13 +91,7 @@ fun AddExpense(navController: NavController) {
                     end.linkTo(parent.end)
                 }
             ){
-//                Image(painter = painterResource(id = R.drawable.chevron_left),
-//                    contentDescription = null,
-//                    Modifier.align(Alignment.CenterStart)
-//                        .clickable {
-//                            navController.navigate("/home")
-//                        }
-//                )
+
                 Text(text = "Add Expense",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
@@ -97,6 +102,8 @@ fun AddExpense(navController: NavController) {
                 )
 
             }
+
+            // Form for entering expense details
             DataForm(modifier = Modifier
                 .constrainAs(card) {
                     top.linkTo(nameRow.bottom)
@@ -105,9 +112,11 @@ fun AddExpense(navController: NavController) {
                 }
                 .padding(top = 5.dp),
                 onAddExpenseClick = {
+                    // Invoke ViewModel method to add expense
                     courinetineScope.launch {
                         if(viewModel.addExpense(it)){
-                            navController.popBackStack()
+                            // Navigate back to previous screen
+                            navController.navigate("home")
                         }
                     }
                 }
@@ -116,9 +125,16 @@ fun AddExpense(navController: NavController) {
     }
 }
 
+/**
+ * Composable function for displaying the form to input expense details.
+ *
+ * @param modifier Modifier for styling the UI element.
+ * @param onAddExpenseClick Callback invoked when adding expense.
+ */
 @Composable
 fun DataForm(modifier: Modifier, onAddExpenseClick: (model: ExpenseEntity) -> Unit){
 
+    // Mutable state variables for input fields
     val name = remember{
         mutableStateOf("")
     }
@@ -149,6 +165,7 @@ fun DataForm(modifier: Modifier, onAddExpenseClick: (model: ExpenseEntity) -> Un
     )
     {
 
+        // Input fields for expense details
         Text(text = "NAME", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color.Gray,
             modifier = Modifier
                 .align(Alignment.Start)
@@ -175,6 +192,7 @@ fun DataForm(modifier: Modifier, onAddExpenseClick: (model: ExpenseEntity) -> Un
                 .align(Alignment.Start)
         )
         Spacer(modifier = Modifier.size(4.dp))
+        // Dropdown menu for selecting expense category
         ExpenseDropDown(listOf("--CATEGORY--","Netflix", "Paypal", "Salary", "Upwork","Others"),
             onItemSelected = {
                 category.value = it
@@ -187,6 +205,7 @@ fun DataForm(modifier: Modifier, onAddExpenseClick: (model: ExpenseEntity) -> Un
                 .align(Alignment.Start)
         )
         Spacer(modifier = Modifier.size(4.dp))
+        // Dropdown menu for selecting expense type
         ExpenseDropDown(listOf("--TYPE--","Income", "Expense"),
             onItemSelected = {
                 type.value = it
@@ -199,6 +218,7 @@ fun DataForm(modifier: Modifier, onAddExpenseClick: (model: ExpenseEntity) -> Un
                 .align(Alignment.Start)
         )
         Spacer(modifier = Modifier.size(4.dp))
+        // Text field for displaying selected date
         OutlinedTextField(value = if(date.value == 0L) "" else Utils.formatDateToReadableForm(date.value), onValueChange = {}, modifier = Modifier
             .fillMaxWidth()
             .clickable { dateDialogVisibility.value = true },
@@ -206,6 +226,7 @@ fun DataForm(modifier: Modifier, onAddExpenseClick: (model: ExpenseEntity) -> Un
         )
         Spacer(modifier = Modifier.size(16.dp))
 
+        // Button to add expense
         Button(
             onClick = {
                       val model = ExpenseEntity(
@@ -217,6 +238,7 @@ fun DataForm(modifier: Modifier, onAddExpenseClick: (model: ExpenseEntity) -> Un
                           type.value
                       )
                 onAddExpenseClick(model)
+
             },
             colors = ButtonDefaults.buttonColors(
                 containerColor = Zinc // Set the button background color to Zinc
@@ -230,6 +252,8 @@ fun DataForm(modifier: Modifier, onAddExpenseClick: (model: ExpenseEntity) -> Un
             Text(text = "Add Expense", fontSize = 14.sp)
         }
     }
+
+    // Display date picker dialog if visibility is true
     if(dateDialogVisibility.value){
         ExpenseDatePickerDialog(onDateSelected =
         {
@@ -241,6 +265,12 @@ fun DataForm(modifier: Modifier, onAddExpenseClick: (model: ExpenseEntity) -> Un
     }
 }
 
+/**
+ * Composable function for date picker dialog.
+ *
+ * @param onDateSelected Callback invoked when date is selected.
+ * @param onDismiss Callback invoked when dialog is dismissed.
+ */
 @Composable
 fun ExpenseDatePickerDialog(
     onDateSelected: (date: Long) -> Unit,
@@ -265,6 +295,12 @@ fun ExpenseDatePickerDialog(
     }
 }
 
+/**
+ * Composable function for dropdown menu to select expense category or type.
+ *
+ * @param listOfItems List of items to display in dropdown menu.
+ * @param onItemSelected Callback invoked when item is selected.
+ */
 @Composable
 fun ExpenseDropDown(listOfItems: List<String>, onItemSelected: (item: String) -> Unit){
     val expanded = remember {
@@ -295,6 +331,9 @@ fun ExpenseDropDown(listOfItems: List<String>, onItemSelected: (item: String) ->
     }
 }
 
+/**
+ * Preview function to display AddExpense composable in preview mode.
+ */
 @Composable
 @Preview(showBackground = true)
 fun AddExpensePreview(){

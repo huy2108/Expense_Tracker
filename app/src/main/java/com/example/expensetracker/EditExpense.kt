@@ -54,10 +54,17 @@ import androidx.compose.ui.graphics.ColorFilter
 
 //import androidx.compose.material.ButtonDefaults
 
+/**
+ * Composable function for editing an expense.
+ *
+ * @param navController The NavController used for navigating between composables.
+ * @param expenseId The ID of the expense to edit.
+ */
 @Composable
 fun EditExpense(navController: NavController, expenseId: Int?){
     val viewModel = AddExpenseViewModelFactory(LocalContext.current).create(AddExpenseViewModel::class.java)
 
+    // Mutable state variables for holding form data and UI state
     val name = remember { mutableStateOf("") }
     val type = remember { mutableStateOf("") }
     val date = remember { mutableStateOf(0L) }
@@ -69,6 +76,7 @@ fun EditExpense(navController: NavController, expenseId: Int?){
     val selectedIconColor = Color.White
 
 
+    // Effect to fetch expense details when expenseId changes
     LaunchedEffect(expenseId) {
         expenseId?.let {
             viewModel.getExpenseById(it).collect { expense ->
@@ -85,15 +93,21 @@ fun EditExpense(navController: NavController, expenseId: Int?){
         }
     }
 
+    // Surface composable for the entire screen
     Surface(modifier = Modifier.fillMaxSize()) {
+        // ConstraintLayout for positioning components
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
             val (nameRow, list, card, topBar) = createRefs()
+
+            // Top bar with image and title
             Image(painter = painterResource(id = R.drawable.ic_header), contentDescription = null,
                 modifier = Modifier.constrainAs(topBar) {
                     top.linkTo(parent.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 })
+
+            // Box containing navigation back button, title, and bookmark toggle
             Box(modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 16.dp, top = 60.dp, end = 16.dp)
@@ -109,7 +123,7 @@ fun EditExpense(navController: NavController, expenseId: Int?){
                         .clickable {
                             navController.navigate("home")
                         }
-                    )
+                )
                 Text(
                     text = "Edit Expense",
                     fontSize = 22.sp,
@@ -120,28 +134,30 @@ fun EditExpense(navController: NavController, expenseId: Int?){
                         .align(Alignment.Center)
                 )
                 Image(
-                        painter = painterResource(id = if (bookmark.value) R.drawable.bookmarkfilled else R.drawable.bookmarkoutlined),
-                contentDescription = null,
-                colorFilter = if (bookmark.value) ColorFilter.tint(selectedIconColor) else null,
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .size(24.dp)
-                    .clickable {
-                        bookmark.value = !bookmark.value
-                        val editedExpense = ExpenseEntity(
-                            id = expenseId,
-                            title = name.value,
-                            amount = amount.value.toDoubleOrNull() ?: 0.0,
-                            date = date.value,
-                            category = category.value,
-                            type = type.value,
-                            bookmark = bookmark.value
-                        )
-                        viewModel.updateExpense(editedExpense)
-                    }
+                    painter = painterResource(id = if (bookmark.value) R.drawable.bookmarkfilled else R.drawable.bookmarkoutlined),
+                    contentDescription = null,
+                    colorFilter = if (bookmark.value) ColorFilter.tint(selectedIconColor) else null,
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .size(24.dp)
+                        .clickable {
+                            bookmark.value = !bookmark.value
+                            val editedExpense = ExpenseEntity(
+                                id = expenseId,
+                                title = name.value,
+                                amount = amount.value.toDoubleOrNull() ?: 0.0,
+                                date = date.value,
+                                category = category.value,
+                                type = type.value,
+                                bookmark = bookmark.value
+                            )
+                            viewModel.updateExpense(editedExpense)
+                        }
                 )
 
             }
+
+            // Column for form fields
             Column(modifier = Modifier
                 .padding(30.dp)
                 .shadow(16.dp)
@@ -155,6 +171,7 @@ fun EditExpense(navController: NavController, expenseId: Int?){
                     end.linkTo(parent.end)
                 }
             ) {
+                // OutlinedTextField for Name field
                 OutlinedTextField(
                     value = name.value,
                     onValueChange = { name.value = it },
@@ -163,6 +180,7 @@ fun EditExpense(navController: NavController, expenseId: Int?){
                         .fillMaxWidth()
                         .padding(16.dp)
                 )
+                // OutlinedTextField for Amount field
                 OutlinedTextField(
                     value = amount.value,
                     onValueChange = { amount.value = it },
@@ -172,76 +190,82 @@ fun EditExpense(navController: NavController, expenseId: Int?){
                         .padding(16.dp)
                 )
 
-                    Text(
-                        text = "Date",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color.Gray,
-                        modifier = Modifier
-                            .align(Alignment.Start)
-                            .padding(start = 16.dp)
-                    )
-                    OutlinedTextField(
-                        value = if (date.value == 0L) "" else Utils.formatDateToReadableForm(date.value),
-                        onValueChange = {},
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { dateDialogVisibility.value = true }
-                            .padding(start = 16.dp, end = 16.dp)
-                        ,
-                        enabled = false
-                    )
+                // Text for Date field
+                Text(
+                    text = "Date",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Gray,
+                    modifier = Modifier
+                        .align(Alignment.Start)
+                        .padding(start = 16.dp)
+                )
+                // OutlinedTextField for Date field
+                OutlinedTextField(
+                    value = if (date.value == 0L) "" else Utils.formatDateToReadableForm(date.value),
+                    onValueChange = {},
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { dateDialogVisibility.value = true }
+                        .padding(start = 16.dp, end = 16.dp)
+                    ,
+                    enabled = false
+                )
 
+                // Text for Category field
+                Text(
+                    text = "Category",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Gray,
+                    modifier = Modifier
+                        .align(Alignment.Start)
+                        .padding(start = 16.dp, top = 16.dp)
+                )
+                Spacer(modifier = Modifier.size(4.dp))
+                // Dropdown for Category selection
+                ExpenseDropDownEdit(
+                    listOfItems = listOf("--CATEGORY--","Netflix", "Paypal", "Salary", "Upwork","Others"),
+                    value = category.value,
+                    onItemSelected = { category.value = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp)
+                )
 
-                    Text(
-                        text = "Category",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color.Gray,
-                        modifier = Modifier
-                            .align(Alignment.Start)
-                            .padding(start = 16.dp, top = 16.dp)
-                    )
-                    Spacer(modifier = Modifier.size(4.dp))
-                    ExpenseDropDownEdit(
-                        listOfItems = listOf("--CATEGORY--","Netflix", "Paypal", "Salary", "Upwork","Others"),
-                        value = category.value,
-                        onItemSelected = { category.value = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 16.dp, end = 16.dp)
-                    )
+                // Text for Type field
+                Text(
+                    text = "Type",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Gray,
+                    modifier = Modifier
+                        .align(Alignment.Start)
+                        .padding(start = 16.dp, top = 16.dp)
+                )
+                Spacer(modifier = Modifier.size(4.dp))
+                // Dropdown for Type selection
+                ExpenseDropDownEdit(
+                    listOfItems = listOf("--TYPE--", "Income", "Expense"),
+                    value = type.value,
+                    onItemSelected = { type.value = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp)
+                )
 
-                    Text(
-                        text = "Type",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color.Gray,
-                        modifier = Modifier
-                            .align(Alignment.Start)
-                            .padding(start = 16.dp, top = 16.dp)
-                    )
-                    Spacer(modifier = Modifier.size(4.dp))
-                    ExpenseDropDownEdit(
-                        listOfItems = listOf("--TYPE--", "Income", "Expense"),
-                        value = type.value,
-                        onItemSelected = { type.value = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 16.dp, end = 16.dp)
-                    )
-
-
+                // Row for Delete and Save buttons
                 Row(modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
+                    // Button for Delete action
                     androidx.compose.material3.Button(
                         onClick = {
                             currentExpense.value?.let {
                                 viewModel.deleteExpense(it)
-                                navController.popBackStack()
+                                navController.navigate("home")
                             }
                         },
                         colors = ButtonDefaults.buttonColors(
@@ -254,6 +278,7 @@ fun EditExpense(navController: NavController, expenseId: Int?){
                     ) {
                         androidx.compose.material3.Text(text = "Delete", fontSize = 14.sp)
                     }
+                    // Button for Save action
                     androidx.compose.material3.Button(
                         onClick = {
                             val editedExpense = ExpenseEntity(
@@ -265,7 +290,7 @@ fun EditExpense(navController: NavController, expenseId: Int?){
                                 type = type.value
                             )
                             viewModel.updateExpense(editedExpense)
-                            navController.popBackStack()
+                            navController.navigate("home")
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Zinc // Set the button background color to Zinc
@@ -279,8 +304,7 @@ fun EditExpense(navController: NavController, expenseId: Int?){
                     }
                 }
 
-
-
+                // Display date picker dialog if dateDialogVisibility is true
                 if(dateDialogVisibility.value){
                     ExpenseDatePickerDialog(onDateSelected =
                     {
@@ -296,6 +320,14 @@ fun EditExpense(navController: NavController, expenseId: Int?){
     }
 }
 
+/**
+ * Composable function for displaying an editable dropdown list.
+ *
+ * @param listOfItems The list of items to display in the dropdown.
+ * @param value The currently selected value from the dropdown.
+ * @param onItemSelected Callback function triggered when an item is selected.
+ * @param modifier Modifier for styling the dropdown.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExpenseDropDownEdit(listOfItems: List<String>, value: String, onItemSelected: (item: String) -> Unit, modifier: Modifier) {
@@ -329,10 +361,9 @@ fun ExpenseDropDownEdit(listOfItems: List<String>, value: String, onItemSelected
     }
 }
 
-
-
-
-
+/**
+ * Preview function for EditExpense composable.
+ */
 @Composable
 @Preview(showBackground = true)
 fun PreviewEditScreen(){

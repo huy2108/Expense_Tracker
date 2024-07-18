@@ -32,18 +32,30 @@ import com.example.expensetracker.viewmodel.AddExpenseViewModel
 import com.example.expensetracker.viewmodel.AddExpenseViewModelFactory
 import kotlinx.coroutines.launch
 
+/**
+ * Composable function for the Setting screen.
+ *
+ * @param navController NavController used for navigation.
+ */
 @Composable
 fun Setting(navController: NavController){
+    // Create an instance of AddExpenseViewModel using AddExpenseViewModelFactory
     val viewModel = AddExpenseViewModelFactory(LocalContext.current).create(AddExpenseViewModel::class.java)
+
     Surface(modifier = Modifier.fillMaxSize()) {
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+            // Define references for ConstraintLayout
             val (nameRow, list, card, topBar) = createRefs()
+
+            // Top bar with an image header
             Image(painter = painterResource(id = R.drawable.ic_header), contentDescription = null,
                 modifier = Modifier.constrainAs(topBar) {
                     top.linkTo(parent.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 })
+
+            // Title text "Setting" centered in a Box
             Box(modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 16.dp, top = 60.dp, end = 16.dp)
@@ -62,6 +74,8 @@ fun Setting(navController: NavController){
                         .align(Alignment.Center)
                 )
             }
+
+            // Content area for data manipulation
             DataManipulation(modifier = Modifier
                 .constrainAs(card) {
                     top.linkTo(nameRow.bottom)
@@ -76,6 +90,13 @@ fun Setting(navController: NavController){
     }
 }
 
+/**
+ * Composable function for displaying data manipulation options.
+ *
+ * @param modifier Modifier for styling and layout.
+ * @param viewModel Instance of AddExpenseViewModel for handling data operations.
+ * @param navController NavController used for navigation.
+ */
 @Composable
 fun DataManipulation(modifier: Modifier, viewModel: AddExpenseViewModel, navController: NavController){
     Column(modifier = modifier
@@ -87,10 +108,11 @@ fun DataManipulation(modifier: Modifier, viewModel: AddExpenseViewModel, navCont
         .padding(16.dp)
         .verticalScroll(rememberScrollState())
     ){
+        // Button to delete all expenses
         androidx.compose.material3.Button(
             onClick = {
                 viewModel.deleteAllExpenses()
-                navController.popBackStack()
+                navController.navigate("home") // Navigate back to home screen after deletion
             },
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Red // Set the button background color to Red for delete all
@@ -104,6 +126,9 @@ fun DataManipulation(modifier: Modifier, viewModel: AddExpenseViewModel, navCont
     }
 }
 
+/**
+ * Preview function to display a preview of the Setting screen.
+ */
 @Composable
 @Preview(showBackground = true)
 fun PreviewSettingScreen(){

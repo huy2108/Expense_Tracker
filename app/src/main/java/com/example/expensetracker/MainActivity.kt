@@ -32,9 +32,13 @@ import androidx.navigation.navArgument
 import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
 import com.example.expensetracker.ui.theme.Zinc
 
+/**
+ * MainActivity serves as the entry point for the Expense Tracker application.
+ */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Set the content of the activity to ExpenseTrackerTheme
         setContent {
             ExpenseTrackerTheme {
                 MainScreen()
@@ -43,28 +47,36 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/**
+ * MainScreen is the main composable function for rendering the entire application screen.
+ */
 @Composable
 fun MainScreen() {
+    // Create a NavHostController to manage navigation
     val navController = rememberNavController()
+
+    // Get the current back stack entry to track navigation state
     val backStackEntry = navController.currentBackStackEntryAsState()
 
+    // Scaffold that contains a BottomAppBar with a NavigationBar for navigation items
     Scaffold(
         bottomBar = {
             BottomAppBar(
                 containerColor = Zinc
-            ){
+            ) {
                 NavigationBar(
                     containerColor = Color.Transparent
                 ) {
+                    // Navigation bar items for different destinations
                     NavigationBarItem(
                         selected = backStackEntry.value?.destination?.route == "home",
                         onClick = { navController.navigate("home") },
                         icon = { Icon(painter = painterResource(id = R.drawable.home), contentDescription = "home", modifier = Modifier.size(34.dp) ) },
                         colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Color.Black, // Icon color when selected
-                            selectedTextColor = Color.Black, // Text color when selected
-                            unselectedIconColor = Color.White, // Icon color when not selected
-                            unselectedTextColor = Color.White // Text color when not selected
+                            selectedIconColor = Color.Black,
+                            selectedTextColor = Color.Black,
+                            unselectedIconColor = Color.White,
+                            unselectedTextColor = Color.White
                         )
                     )
                     NavigationBarItem(
@@ -72,10 +84,10 @@ fun MainScreen() {
                         onClick = { navController.navigate("add") },
                         icon = { Icon(painter = painterResource(id = R.drawable.add), contentDescription = "add", modifier = Modifier.size(34.dp)) },
                         colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Color.Black, // Icon color when selected
-                            selectedTextColor = Color.Black, // Text color when selected
-                            unselectedIconColor = Color.White, // Icon color when not selected
-                            unselectedTextColor = Color.White // Text color when not selected
+                            selectedIconColor = Color.Black,
+                            selectedTextColor = Color.Black,
+                            unselectedIconColor = Color.White,
+                            unselectedTextColor = Color.White
                         )
                     )
                     NavigationBarItem(
@@ -83,10 +95,10 @@ fun MainScreen() {
                         onClick = { navController.navigate("bookmark") },
                         icon = { Icon(painter = painterResource(id = R.drawable.bookmark), contentDescription = "graph", modifier = Modifier.size(34.dp)) },
                         colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Color.Black, // Icon color when selected
-                            selectedTextColor = Color.Black, // Text color when selected
-                            unselectedIconColor = Color.White, // Icon color when not selected
-                            unselectedTextColor = Color.White // Text color when not selected
+                            selectedIconColor = Color.Black,
+                            selectedTextColor = Color.Black,
+                            unselectedIconColor = Color.White,
+                            unselectedTextColor = Color.White
                         )
                     )
                     NavigationBarItem(
@@ -94,17 +106,19 @@ fun MainScreen() {
                         onClick = { navController.navigate("setting") },
                         icon = { Icon(painter = painterResource(id = R.drawable.setting), contentDescription = "setting", modifier = Modifier.size(34.dp)) },
                         colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Color.Black, // Icon color when selected
-                            selectedTextColor = Color.Black, // Text color when selected
-                            unselectedIconColor = Color.White, // Icon color when not selected
-                            unselectedTextColor = Color.White // Text color when not selected
+                            selectedIconColor = Color.Black,
+                            selectedTextColor = Color.Black,
+                            unselectedIconColor = Color.White,
+                            unselectedTextColor = Color.White
                         )
                     )
                 }
             }
         },
         content = { innerPadding ->
+            // NavHost for handling navigation destinations
             NavHost(navController = navController, startDestination = "home") {
+                // Composable for displaying the HomeScreen
                 composable("home") {
                     Surface(
                         modifier = Modifier
@@ -115,6 +129,7 @@ fun MainScreen() {
                         HomeScreen(navController)
                     }
                 }
+                // Composable for displaying the AddExpense screen
                 composable("add") {
                     Surface(
                         modifier = Modifier
@@ -125,6 +140,7 @@ fun MainScreen() {
                         AddExpense(navController)
                     }
                 }
+                // Composable for displaying the Setting screen
                 composable("setting") {
                     Surface(
                         modifier = Modifier
@@ -135,6 +151,7 @@ fun MainScreen() {
                         Setting(navController)
                     }
                 }
+                // Composable for displaying the Bookmark screen
                 composable("bookmark") {
                     Surface(
                         modifier = Modifier
@@ -145,12 +162,12 @@ fun MainScreen() {
                         BookMark(navController)
                     }
                 }
+                // Composable for editing an expense with dynamic expenseId argument
                 composable(
                     route = "edit_expense/{expenseId}",
                     arguments = listOf(navArgument("expenseId") { type = NavType.IntType })
                 ) { backStackEntry ->
                     val expenseId = backStackEntry.arguments?.getInt("expenseId")
-                    // Pass the expenseId to AddExpense composable
                     Surface(
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background
