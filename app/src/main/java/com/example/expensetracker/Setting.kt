@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -48,17 +49,19 @@ fun Setting(navController: NavController){
             val (nameRow, list, card, topBar) = createRefs()
 
             // Top bar with an image header
-            Image(painter = painterResource(id = R.drawable.ic_header), contentDescription = null,
+            Image(painter = painterResource(id = R.drawable.heroimage), contentDescription = null,
                 modifier = Modifier.constrainAs(topBar) {
                     top.linkTo(parent.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                })
+                }
+                    .size(width = 435.dp, height = 285.dp)
+            )
 
             // Title text "Setting" centered in a Box
             Box(modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, top = 60.dp, end = 16.dp)
+                .padding(start = 16.dp, top = 80.dp, end = 16.dp)
                 .constrainAs(nameRow) {
                     top.linkTo(parent.top)
                     start.linkTo(parent.start)

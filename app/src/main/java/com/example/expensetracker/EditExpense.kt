@@ -100,12 +100,14 @@ fun EditExpense(navController: NavController, expenseId: Int?){
             val (nameRow, list, card, topBar) = createRefs()
 
             // Top bar with image and title
-            Image(painter = painterResource(id = R.drawable.ic_header), contentDescription = null,
+            Image(painter = painterResource(id = R.drawable.heroimage), contentDescription = null,
                 modifier = Modifier.constrainAs(topBar) {
                     top.linkTo(parent.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                })
+                }
+                    .size(width = 435.dp, height = 285.dp)
+            )
 
             // Box containing navigation back button, title, and bookmark toggle
             Box(modifier = Modifier
@@ -117,12 +119,13 @@ fun EditExpense(navController: NavController, expenseId: Int?){
                     end.linkTo(parent.end)
                 }
             ){
-                Image(painter = painterResource(id = R.drawable.chevron_left), contentDescription = null,
+                Image(painter = painterResource(id = R.drawable.chevronleft), contentDescription = null,
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .clickable {
                             navController.navigate("home")
                         }
+                        .size(25.dp)
                 )
                 Text(
                     text = "Edit Expense",
@@ -287,7 +290,8 @@ fun EditExpense(navController: NavController, expenseId: Int?){
                                 amount = amount.value.toDoubleOrNull() ?: 0.0,
                                 date = date.value,
                                 category = category.value,
-                                type = type.value
+                                type = type.value,
+                                bookmark = bookmark.value
                             )
                             viewModel.updateExpense(editedExpense)
                             navController.navigate("home")

@@ -61,12 +61,14 @@ fun BookMark(navController: NavController){
             val expensesByBookmarkTrue by viewModel.expensesByBookmarkTrue.collectAsState(initial = emptyList())
 
             // Top bar with image and title
-            Image(painter = painterResource(id = R.drawable.ic_header), contentDescription = null,
+            Image(painter = painterResource(id = R.drawable.heroimage), contentDescription = null,
                 modifier = Modifier.constrainAs(topBar) {
                     top.linkTo(parent.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                })
+                }
+                    .size(width = 435.dp, height = 285.dp)
+            )
 
             // Box containing the title "Bookmark"
             Box(modifier = Modifier

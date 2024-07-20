@@ -81,12 +81,14 @@ fun HomeScreen(navController: NavController){
             }
 
             // Top bar image
-            Image(painter = painterResource(id = R.drawable.ic_header), contentDescription = null,
+            Image(painter = painterResource(id = R.drawable.heroimage), contentDescription = null,
                 modifier = Modifier.constrainAs(topBar){
                     top.linkTo(parent.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                })
+                }
+                    .size(width = 435.dp, height = 285.dp)
+            )
 
             // Box for name row
             Box(
@@ -105,10 +107,11 @@ fun HomeScreen(navController: NavController){
                     Text(text = "Lê Quang Huy", fontSize = 20.sp, color = Color.White, fontWeight = FontWeight.Bold)
                 }
                 // Image aligned to center end
-                Image(painter = painterResource(id = R.drawable.frame_4),
+                Image(painter = painterResource(id = R.drawable.frame4),
                     contentDescription = null,
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
+                        .size(40.dp)
                 )
             }
 
@@ -185,11 +188,12 @@ fun CardItem(modifier: Modifier, balance: String, income: String, expense: Strin
             }
             // Column for aligning end
             Column (modifier = Modifier.align(Alignment.CenterEnd)){
-                Image(painter = painterResource(id = R.drawable.ic_dot),
+                Image(painter = painterResource(id = R.drawable.dotheader),
                     contentDescription = null,
                     modifier = Modifier
 //                    .align(Alignment.CenterEnd)
                         .clickable { showMenu = !showMenu }
+                        .size(25.dp)
                 )
                 // Dropdown for expense
                 ExpenseDropDown(
@@ -211,15 +215,16 @@ fun CardItem(modifier: Modifier, balance: String, income: String, expense: Strin
             CardRowItem(modifier = Modifier.align(Alignment.CenterStart),
                 title = "Income",
                 amount = income,
-                image = R.drawable.frame_7,
+                image = R.drawable.frame7,
                 textStyle = Alignment.Start
             )
             // Row item
             CardRowItem(modifier = Modifier.align(Alignment.CenterEnd),
                 title = "Expense",
                 amount = expense,
-                image = R.drawable.frame_5,
-                textStyle = Alignment.End
+                image = R.drawable.frame5,
+                textStyle = Alignment.End,
+
             )
         }
 
@@ -322,7 +327,7 @@ fun CardRowItem(modifier: Modifier,
         // Row item
         Row{
             // Image for card row
-            Image(painter = painterResource(id = image), contentDescription = null)
+            Image(painter = painterResource(id = image), contentDescription = null, Modifier.size(25.dp))
             // Spacer for card row
             Spacer(modifier = Modifier.size(8.dp))
             // Text for title
