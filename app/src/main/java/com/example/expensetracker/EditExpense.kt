@@ -137,7 +137,7 @@ fun EditExpense(navController: NavController, expenseId: Int?){
                         .align(Alignment.Center)
                 )
                 Image(
-                    painter = painterResource(id = if (bookmark.value) R.drawable.bookmarkfilled else R.drawable.bookmarkoutlined),
+                    painter = painterResource(id = if (bookmark.value) R.drawable.bookmarkk else R.drawable.bookmarkempty),
                     contentDescription = null,
                     colorFilter = if (bookmark.value) ColorFilter.tint(selectedIconColor) else null,
                     modifier = Modifier
